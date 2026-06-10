@@ -26,7 +26,7 @@ function badge(status) {
 
 async function init() {
   // ── Load audit data ───────────────────────────────────────────────────────
-  const auditRes = await fetch('/data/ne-audit.json');
+  const auditRes = await fetch('/public/data/ne-audit.json');
   const data     = await auditRes.json();
   const byAbbr   = {};
   data.states.forEach(s => { byAbbr[s.abbr] = s; });
@@ -133,7 +133,7 @@ async function init() {
   // ── Download button ───────────────────────────────────────────────────────
   document.getElementById('btn-download').addEventListener('click', () => {
     const a = document.createElement('a');
-    a.href     = '/data/ne-audit.csv';
+    a.href     = '/public/data/ne-audit.csv';
     a.download = 'ne-contech-cleantech-audit-2026.csv';
     a.click();
   });
