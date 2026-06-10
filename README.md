@@ -1,4 +1,4 @@
-# New England Contech-for-Cleantech Audit Map · 2026
+# New England Contech-for-Cleantech Update · 2026
 
 Interactive Mapbox map tracking which New England states are filling the contech-for-cleantech funding gap, four years after the original diagnosis in [NREL/CP-5500-83262]([https://www.nrel.gov/docs/fy22osti/83262.pdf](https://research-hub.nlr.gov/en/publications/contech-to-accelerate-cleantech-seeding-emerging-innovation-progr/)).
 
