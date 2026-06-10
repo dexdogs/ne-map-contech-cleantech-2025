@@ -1,34 +1,62 @@
 // src/map.js — New England Contech-for-Cleantech Audit Map
-// Reads:  /data/ne-audit.json   (backend)
-// Needs:  MAPBOX_TOKEN in window.MAPBOX_TOKEN  (injected by index.html)
+// GeoJSON source: us-atlas (CDN, free, no Mapbox Enterprise required)
 
-const SCORE = { 'Working': 2, 'Partial': 1, 'Weak / absent': 0 };
-const STATUS_COLOR = { 'Working': '#22c55e', 'Partial': '#f59e0b', 'Weak / absent': '#ef4444' };
+const SCORE  = { 'Working': 2, 'Partial': 1, 'Weak / absent': 0 };
+const S_COLOR = { 'Working': '#22c55e', 'Partial': '#f59e0b', 'Weak / absent': '#ef4444' };
 
-// Composite score = gov + industry (0-4); philanthropy noted but not scored (universally absent)
+// NE state FIPS codes
+const NE_FIPS = { '25':'MA','09':'CT','50':'VT','23':'ME','44':'RI','33':'NH' };
+
 function compositeScore(s) {
   return SCORE[s.scorecard.gov_validates] + SCORE[s.scorecard.industry_acquires];
 }
 
-// GeoJSON polygon centroids are in the data; we use Mapbox-native NE states tileset
-// for choropleth fill, keyed by state FIPS abbreviation.
-const NE_STATES = ['ME','NH','VT','MA','RI','CT'];
+function fillColor(score) {
+  return score === 4 ? '#166534'
+       : score === 3 ? '#22c55e'
+       : score === 2 ? '#f59e0b'
+       : score === 1 ? '#ef4444'
+       :               '#94a3b8';
+}
+
+function badge(status) {
+  const c = S_COLOR[status] || '#94a3b8';
+  return `<span class="badge" style="background:${c}20;color:${c};border:1px solid ${c}60">${status}</span>`;
+}
 
 async function init() {
-  const res  = await fetch('/data/ne-audit.json');
-  const data = await res.json();
-
-  // Build lookup by abbr
-  const byAbbr = {};
+  // ── Load audit data ───────────────────────────────────────────────────────
+  const auditRes = await fetch('/data/ne-audit.json');
+  const data     = await auditRes.json();
+  const byAbbr   = {};
   data.states.forEach(s => { byAbbr[s.abbr] = s; });
 
+  // ── Load TopoJSON (free, no auth) ─────────────────────────────────────────
+  const topoRes  = await fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json');
+  const topology = await topoRes.json();
+
+  // Convert to GeoJSON and filter to NE states only
+  const geojson = topojson.feature(topology, topology.objects.states);
+  geojson.features = geojson.features.filter(f => NE_FIPS[f.id]);
+
+  // Attach audit data + score to each feature
+  geojson.features.forEach(f => {
+    const abbr  = NE_FIPS[f.id];
+    const state = byAbbr[abbr];
+    f.properties.abbr  = abbr;
+    f.properties.name  = state ? state.state : abbr;
+    f.properties.score = state ? compositeScore(state) : 0;
+    f.properties.fill  = state ? fillColor(compositeScore(state)) : '#94a3b8';
+  });
+
+  // ── Init Mapbox ───────────────────────────────────────────────────────────
   mapboxgl.accessToken = window.MAPBOX_TOKEN;
 
   const map = new mapboxgl.Map({
     container: 'map',
     style:     'mapbox://styles/mapbox/light-v11',
     center:    [-71.5, 44.0],
-    zoom:      6.2,
+    zoom:      6.0,
     minZoom:   5,
     maxZoom:   10
   });
@@ -37,117 +65,95 @@ async function init() {
 
   map.on('load', () => {
 
-    // ── Choropleth layer (US states tileset, filtered to NE) ──────────────────
-    map.addSource('states', {
-      type: 'vector',
-      url:  'mapbox://mapbox.boundaries-adm1-v3'
-    });
+    // ── Add NE GeoJSON source ─────────────────────────────────────────────
+    map.addSource('ne-states', { type: 'geojson', data: geojson });
 
-    // Color expression: match on state ISO code (US-MA, US-CT …)
-    const colorExpr = ['match', ['get', 'iso_3166_2']];
-    data.states.forEach(s => {
-      const score = compositeScore(s);
-      // 4 = strong green, 0 = grey
-      const fill = score === 4 ? '#166534'
-                 : score === 3 ? '#22c55e'
-                 : score === 2 ? '#f59e0b'
-                 : score === 1 ? '#ef4444'
-                 :               '#94a3b8';
-      colorExpr.push(`US-${s.abbr}`, fill);
-    });
-    colorExpr.push('#e2e8f0'); // default (non-NE states, invisible)
-
+    // Choropleth fill — use pre-computed fill property
     map.addLayer({
-      id:           'ne-fill',
-      type:         'fill',
-      source:       'states',
-      'source-layer': 'boundaries_admin_1',
-      filter:       ['in', 'iso_3166_2', ...NE_STATES.map(a => `US-${a}`)],
+      id:    'ne-fill',
+      type:  'fill',
+      source:'ne-states',
       paint: {
-        'fill-color':   colorExpr,
+        'fill-color':   ['get', 'fill'],
         'fill-opacity': 0.72
       }
     });
 
+    // State borders
     map.addLayer({
-      id:           'ne-outline',
-      type:         'line',
-      source:       'states',
-      'source-layer': 'boundaries_admin_1',
-      filter:       ['in', 'iso_3166_2', ...NE_STATES.map(a => `US-${a}`)],
+      id:    'ne-outline',
+      type:  'line',
+      source:'ne-states',
       paint: {
         'line-color': '#1e293b',
-        'line-width': 1.4
+        'line-width': 1.6
       }
     });
 
-    // ── Hover highlight ───────────────────────────────────────────────────────
+    // Hover highlight
     map.addLayer({
-      id:           'ne-hover',
-      type:         'fill',
-      source:       'states',
-      'source-layer': 'boundaries_admin_1',
-      filter:       ['==', 'iso_3166_2', ''],
+      id:    'ne-hover',
+      type:  'fill',
+      source:'ne-states',
+      filter:['==', 'abbr', ''],
       paint: {
-        'fill-color':   '#fff',
-        'fill-opacity': 0.15
+        'fill-color':   '#ffffff',
+        'fill-opacity': 0.18
       }
     });
 
-    let hoveredId = null;
+    // ── Interactions ──────────────────────────────────────────────────────
     map.on('mousemove', 'ne-fill', (e) => {
-      const iso = e.features[0].properties.iso_3166_2;
-      map.setFilter('ne-hover', ['==', 'iso_3166_2', iso]);
+      const abbr = e.features[0].properties.abbr;
+      map.setFilter('ne-hover', ['==', 'abbr', abbr]);
       map.getCanvas().style.cursor = 'pointer';
     });
     map.on('mouseleave', 'ne-fill', () => {
-      map.setFilter('ne-hover', ['==', 'iso_3166_2', '']);
+      map.setFilter('ne-hover', ['==', 'abbr', '']);
       map.getCanvas().style.cursor = '';
     });
-
-    // ── Click → detail panel ─────────────────────────────────────────────────
     map.on('click', 'ne-fill', (e) => {
-      const iso  = e.features[0].properties.iso_3166_2;
-      const abbr = iso.replace('US-', '');
+      const abbr = e.features[0].properties.abbr;
       const s    = byAbbr[abbr];
-      if (!s) return;
-      openPanel(s, data.sources);
+      if (s) openPanel(s, data.sources);
     });
 
-    // ── State label markers ──────────────────────────────────────────────────
+    // ── State label markers ───────────────────────────────────────────────
     data.states.forEach(s => {
       const el = document.createElement('div');
       el.className   = 'state-label';
       el.textContent = s.abbr;
-      el.title       = s.state;
       el.addEventListener('click', () => openPanel(s, data.sources));
       new mapboxgl.Marker({ element: el, anchor: 'center' })
         .setLngLat([s.lng, s.lat])
         .addTo(map);
     });
   });
+
+  // ── Download button ───────────────────────────────────────────────────────
+  document.getElementById('btn-download').addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href     = '/data/ne-audit.csv';
+    a.download = 'ne-contech-cleantech-audit-2026.csv';
+    a.click();
+  });
 }
 
 // =============================================================================
 // DETAIL PANEL
 // =============================================================================
-function badge(status) {
-  const c = STATUS_COLOR[status] || '#94a3b8';
-  return `<span class="badge" style="background:${c}20;color:${c};border:1px solid ${c}60">${status}</span>`;
-}
-
 function openPanel(s, allSources) {
-  const panel = document.getElementById('panel');
-
+  const panel    = document.getElementById('panel');
   const srcLookup = {};
   allSources.forEach(src => { srcLookup[src.id] = src; });
 
   const sourceLinks = s.sources
-    .map(id => srcLookup[id])
-    .filter(Boolean)
+    .map(id => srcLookup[id]).filter(Boolean)
     .map(src =>
-      `<li><a href="${src.url}" target="_blank" rel="noopener">[${src.id}] ${src.source}</a><br>
-       <span class="src-claim">${src.claim}</span></li>`
+      `<li>
+        <a href="${src.url}" target="_blank" rel="noopener">[${src.id}] ${src.source}</a>
+        <span class="src-claim">${src.claim}</span>
+       </li>`
     ).join('');
 
   panel.innerHTML = `
@@ -200,16 +206,80 @@ function openPanel(s, allSources) {
   `;
 
   panel.classList.add('open');
+  document.getElementById('info-panel').classList.remove('open');
+  document.getElementById('feedback-panel').classList.remove('open');
 }
 
 // =============================================================================
-// DOWNLOAD BUTTON
+// INFO PANEL
 // =============================================================================
-document.getElementById('btn-download').addEventListener('click', () => {
-  const a = document.createElement('a');
-  a.href     = '/data/ne-audit.csv';
-  a.download = 'ne-contech-cleantech-audit-2026.csv';
-  a.click();
-});
+function openInfo() {
+  const panel = document.getElementById('info-panel');
+  const isOpen = panel.classList.contains('open');
+  closeAllPanels();
+  if (!isOpen) panel.classList.add('open');
+}
 
-init();
+// =============================================================================
+// FEEDBACK PANEL
+// =============================================================================
+function openFeedback() {
+  const panel = document.getElementById('feedback-panel');
+  const isOpen = panel.classList.contains('open');
+  closeAllPanels();
+  if (!isOpen) panel.classList.add('open');
+}
+
+function closeAllPanels() {
+  ['panel','info-panel','feedback-panel'].forEach(id => {
+    document.getElementById(id).classList.remove('open');
+  });
+}
+
+// Feedback form submission via Formspree (no backend needed)
+async function submitFeedback(e) {
+  e.preventDefault();
+  const form   = document.getElementById('feedback-form');
+  const btn    = document.getElementById('feedback-submit');
+  const status = document.getElementById('feedback-status');
+
+  btn.disabled   = true;
+  btn.textContent = 'Sending…';
+
+  const payload = {
+    name:        form.querySelector('[name=name]').value,
+    email:       form.querySelector('[name=email]').value,
+    state:       form.querySelector('[name=state]').value,
+    data_type:   form.querySelector('[name=data_type]').value,
+    description: form.querySelector('[name=description]').value,
+    source_url:  form.querySelector('[name=source_url]').value,
+  };
+
+  try {
+    const res = await fetch('https://formspree.io/f/FORMSPREE_ID', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body:    JSON.stringify(payload)
+    });
+    if (res.ok) {
+      status.textContent = '✓ Submitted — thank you. We'll review and update the map.';
+      status.className   = 'form-status ok';
+      form.reset();
+    } else {
+      throw new Error('Server error');
+    }
+  } catch {
+    status.textContent = '✗ Something went wrong. Email ankur@dexdogs.earth directly.';
+    status.className   = 'form-status err';
+  }
+
+  btn.disabled    = false;
+  btn.textContent = 'Submit';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btn-info').addEventListener('click', openInfo);
+  document.getElementById('btn-feedback').addEventListener('click', openFeedback);
+  document.getElementById('feedback-form').addEventListener('submit', submitFeedback);
+  init();
+});

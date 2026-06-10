@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>New England Contech-for-Cleantech Audit 2026</title>
+  <title>NE Construction tech-for-Climate tech 2026 // dexdogs</title>
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
   <link rel="stylesheet" href="src/style.css" />
 </head>
 <body>
@@ -13,12 +14,15 @@
   <!-- ── Top bar ──────────────────────────────────────────────────────────── -->
   <header class="topbar">
     <div class="topbar-left">
-      <span class="topbar-title">New England Contech-for-Cleantech</span>
-      <span class="topbar-sub">2026 Audit · Independent update of NREL/CP-5500-83262</span>
+      <span class="topbar-title">New England Construction tech-for-Climate tech 2026 Audit</span>
+      <span class="topbar-divider">//</span>
+      <span class="topbar-brand">dexdogs</span>
     </div>
     <div class="topbar-right">
-      <button id="btn-download" class="btn-dl">⬇ Download CSV</button>
-      <a href="https://www.nrel.gov/docs/fy22osti/83262.pdf" target="_blank" class="btn-paper">2022 Paper ↗</a>
+      <button id="btn-info"     class="btn-nav">About</button>
+      <button id="btn-feedback" class="btn-nav">Contribute data</button>
+      <button id="btn-download" class="btn-dl">⬇ CSV</button>
+      <a href="https://research-hub.nrl.gov/en/publications/contech-to-accelerate-cleantech-seeding-emerging-innovation-progr/" target="_blank" class="btn-paper">2022 Paper ↗</a>
     </div>
   </header>
 
@@ -27,25 +31,120 @@
 
   <!-- ── Legend ───────────────────────────────────────────────────────────── -->
   <div class="legend">
-    <div class="legend-title">Composite score<br><span class="legend-sub">(Gov + Industry roles)</span></div>
+    <div class="legend-title">Composite score<br><span class="legend-sub">State validates + Industry acquires</span></div>
     <div class="legend-row"><span class="swatch" style="background:#166534"></span> Strong (4)</div>
     <div class="legend-row"><span class="swatch" style="background:#22c55e"></span> Good (3)</div>
     <div class="legend-row"><span class="swatch" style="background:#f59e0b"></span> Partial (2)</div>
     <div class="legend-row"><span class="swatch" style="background:#ef4444"></span> Weak (1)</div>
     <div class="legend-row"><span class="swatch" style="background:#94a3b8"></span> Absent (0)</div>
-    <hr/>
-    <div class="legend-note">Philanthropy = universally absent across NE</div>
   </div>
 
-  <!-- ── Detail panel ─────────────────────────────────────────────────────── -->
-  <div id="panel" class="panel"></div>
+  <!-- ── State detail panel ───────────────────────────────────────────────── -->
+  <div id="panel" class="panel side-panel"></div>
 
-  <!-- ── Inject token + load map ──────────────────────────────────────────── -->
-  <script>
-    // MAPBOX_TOKEN is injected by Vercel environment variable at build time.
-    // For local dev, set MAPBOX_TOKEN in .env and Vite will replace it.
-    window.MAPBOX_TOKEN = '__MAPBOX_TOKEN__';
-  </script>
-  <script type="module" src="src/map.js"></script>
+  <!-- ── Info panel ───────────────────────────────────────────────────────── -->
+  <div id="info-panel" class="panel side-panel">
+    <button class="close-btn" onclick="document.getElementById('info-panel').classList.remove('open')">✕</button>
+    <h2 class="panel-section-title">About this map</h2>
+
+    <section>
+      <h3>What is this?</h3>
+      <p>A 2026 field test of the three-actor model first described in <a href="https://research-hub.nrl.gov/en/publications/contech-to-accelerate-cleantech-seeding-emerging-innovation-progr/" target="_blank" rel="noopener">Podder et al. (2022)</a>. That paper diagnosed a structural funding gap: the built environment accounts for ~21% of global GHG emissions but receives only ~4% of climate-tech venture capital.</p>
+      <p>This map asks: four years later, which New England states are filling that gap — and how?</p>
+    </section>
+
+    <section>
+      <h3>The three-actor model</h3>
+      <p>The original paper identified three actors needed to move a contech-for-cleantech startup across the Valley of Death:</p>
+      <table class="info-table">
+        <tbody>
+          <tr><td>①</td><td><strong>State validates</strong></td><td>Government funding de-risks early-stage startups</td></tr>
+          <tr><td>②</td><td><strong>Philanthropy accelerates</strong></td><td>Philanthropic capital bridges to commercial readiness</td></tr>
+          <tr><td>③</td><td><strong>Industry acquires</strong></td><td>Construction/materials incumbents acquire or partner</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>What changed since 2022?</h3>
+      <p>Federal DOE funding — the backstop behind the original model — has been sharply curtailed since January 2025. 356 DOE awards totaling $12.5B were terminated nationally. In Massachusetts alone, $466M in grants were rescinded. State-level institutions are now the primary actors, not federal backup.</p>
+    </section>
+
+    <section>
+      <h3>Scoring</h3>
+      <p>Each state is scored on two roles (philanthropy is universally absent across New England and excluded from the composite): State validates (0–2) + Industry acquires (0–2) = composite 0–4. Click any state for the full three-actor breakdown.</p>
+    </section>
+
+    <section>
+      <h3>Authorship</h3>
+      <p>Independent update. Not affiliated with NREL or the U.S. Department of Energy.<br>
+      Built by <a href="https://dexdogs.earth" target="_blank" rel="noopener">dexdogs</a>.</p>
+    </section>
+  </div>
+
+  <!-- ── Feedback / contribute panel ──────────────────────────────────────── -->
+  <div id="feedback-panel" class="panel side-panel">
+    <button class="close-btn" onclick="document.getElementById('feedback-panel').classList.remove('open')">✕</button>
+    <h2 class="panel-section-title">Contribute data</h2>
+
+    <section>
+      <p>This map is only as good as its data. If you know of a program, fund, acquisition, accelerator, or policy development we've missed — in any New England state — tell us.</p>
+      <p class="muted">Submissions reviewed by <a href="mailto:ankur@dexdogs.earth">ankur@dexdogs.earth</a>. Verified data will be added to the next update.</p>
+    </section>
+
+    <form id="feedback-form" class="feedback-form">
+
+      <label>Your name <span class="opt">(optional)</span>
+        <input type="text" name="name" placeholder="Jane Smith" autocomplete="name" />
+      </label>
+
+      <label>Your email <span class="opt">(optional — only if you want a response)</span>
+        <input type="email" name="email" placeholder="jane@example.com" autocomplete="email" />
+      </label>
+
+      <label>State this relates to <span class="req">*</span>
+        <select name="state" required>
+          <option value="">— Select —</option>
+          <option>Massachusetts</option>
+          <option>Connecticut</option>
+          <option>Vermont</option>
+          <option>Maine</option>
+          <option>Rhode Island</option>
+          <option>New Hampshire</option>
+          <option>All / Regional</option>
+        </select>
+      </label>
+
+      <label>Type of data <span class="req">*</span>
+        <select name="data_type" required>
+          <option value="">— Select —</option>
+          <option>Government program or fund</option>
+          <option>Philanthropic grant or program</option>
+          <option>Industry acquisition or investment</option>
+          <option>Accelerator or incubator</option>
+          <option>Policy change</option>
+          <option>Startup / company to add</option>
+          <option>Correction to existing data</option>
+          <option>Other</option>
+        </select>
+      </label>
+
+      <label>Describe the data <span class="req">*</span>
+        <textarea name="description" rows="4" required
+          placeholder="e.g. Rhode Island launched a $15M green building accelerator in March 2026, focused on retrofit startups. Run by RI Commerce."></textarea>
+      </label>
+
+      <label>Source URL <span class="opt">(link to a press release, report, or webpage)</span>
+        <input type="url" name="source_url" placeholder="https://..." />
+      </label>
+
+      <div id="feedback-status" class="form-status"></div>
+      <button type="submit" id="feedback-submit" class="btn-submit">Submit</button>
+    </form>
+  </div>
+
+  <!-- ── Token + script ────────────────────────────────────────────────────── -->
+  <script>window.MAPBOX_TOKEN = '__MAPBOX_TOKEN__';</script>
+  <script src="src/map.js"></script>
 </body>
 </html>
