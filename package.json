@@ -1,0 +1,11 @@
+{
+  "name": "ne-map-contech-cleantech-2025",
+  "version": "1.0.0",
+  "description": "New England Contech-for-Cleantech Audit Map 2026",
+  "scripts": {
+    "export-csv": "node scripts/export-csv.js",
+    "inject-token": "node scripts/inject-token.js",
+    "build": "node scripts/inject-token.js"
+  },
+  "engines": { "node": ">=18" }
+}

@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "title": "New England Contech-for-Cleantech Audit 2026",
+    "description": "Field test of the 2022 three-actor model (Podder et al., NREL/CP-5500-83262) across New England. Independent update, not NREL-affiliated.",
+    "original_paper": "https://www.nrel.gov/docs/fy22osti/83262.pdf",
+    "updated": "2026-06"
+  },
+  "legend": {
+    "Working":       { "label": "Working",       "color": "#22c55e", "score": 2 },
+    "Partial":       { "label": "Partial",        "color": "#f59e0b", "score": 1 },
+    "Weak / absent": { "label": "Weak / absent",  "color": "#ef4444", "score": 0 }
+  },
+  "states": [
+    {
+      "state": "Massachusetts",
+      "abbr": "MA",
+      "rank": 1,
+      "tier": "Capital institution",
+      "lat": 42.3601,
+      "lng": -71.0589,
+      "scorecard": {
+        "gov_validates":      "Working",
+        "phil_accelerates":   "Weak / absent",
+        "industry_acquires":  "Partial"
+      },
+      "notes": "MassCEC TDA ($20M/yr) + CriticalMass ($3M/yr) + InnovateMass ($350K). Barr funds workforce/equity, not startups. Holcim invests in Sublime Systems (MA cement).",
+      "primary_institutions": "MassCEC",
+      "institution_type": "State agency: validation + equity",
+      "can_play_all_3": true,
+      "built_env_signal": "Buildings = 36% of state emissions; Holcim/Sublime acquisition anchored in MA",
+      "sources": [3,4,5,6,7,8,9,10,11,12,13]
+    },
+    {
+      "state": "Connecticut",
+      "abbr": "CT",
+      "rank": 2,
+      "tier": "Capital institution",
+      "lat": 41.7658,
+      "lng": -72.6851,
+      "scorecard": {
+        "gov_validates":     "Working",
+        "phil_accelerates":  "Weak / absent",
+        "industry_acquires": "Weak / absent"
+      },
+      "notes": "CT Green Bank (statutory) + CI's $100M ClimateTech Fund naming the built environment explicitly (e.g. CarbonBuilt). Only stale, sector-generic exits on acquisition.",
+      "primary_institutions": "CT Green Bank + CT Innovations ClimateTech Fund ($100M)",
+      "institution_type": "Green bank + state equity fund",
+      "can_play_all_3": true,
+      "built_env_signal": "Fund names 'Built Environment' as explicit focus; CarbonBuilt, Enertiv in portfolio; C-PACE most mature in region",
+      "sources": [14,15,16]
+    },
+    {
+      "state": "Vermont",
+      "abbr": "VT",
+      "rank": 3,
+      "tier": "Accelerator / incubator",
+      "lat": 44.2601,
+      "lng": -72.5754,
+      "scorecard": {
+        "gov_validates":     "Partial",
+        "phil_accelerates":  "Weak / absent",
+        "industry_acquires": "Weak / absent"
+      },
+      "notes": "DeltaClimeVT accelerator + utility pilots (Burlington Electric). No capital institution behind it.",
+      "primary_institutions": "DeltaClimeVT (Vermont Sustainable Jobs Fund)",
+      "institution_type": "Nonprofit accelerator",
+      "can_play_all_3": false,
+      "built_env_signal": "Utility pilots as validation; 2025 cohort focused on building/heating electrification",
+      "sources": [17]
+    },
+    {
+      "state": "Maine",
+      "abbr": "ME",
+      "rank": 4,
+      "tier": "Accelerator / incubator",
+      "lat": 45.2538,
+      "lng": -69.4455,
+      "scorecard": {
+        "gov_validates":     "Partial",
+        "phil_accelerates":  "Weak / absent",
+        "industry_acquires": "Weak / absent"
+      },
+      "notes": "MTI + Roux Institute incubator + Weatherization Business Lab. Building apparatus from lowest base in NE.",
+      "primary_institutions": "Maine Technology Institute + Roux Institute incubator",
+      "institution_type": "Incubator + state grants",
+      "can_play_all_3": false,
+      "built_env_signal": "Weatherization Business Lab scaling efficiency contractors",
+      "sources": [18,19]
+    },
+    {
+      "state": "Rhode Island",
+      "abbr": "RI",
+      "rank": 5,
+      "tier": "Grants / loan fund / retreating",
+      "lat": 41.7001,
+      "lng": -71.5149,
+      "scorecard": {
+        "gov_validates":     "Weak / absent",
+        "phil_accelerates":  "Weak / absent",
+        "industry_acquires": "Weak / absent"
+      },
+      "notes": "Renewable Energy Fund = project deployment grants only. No green bank, no early-stage equity.",
+      "primary_institutions": "RI Commerce Renewable Energy Fund",
+      "institution_type": "Project deployment grants",
+      "can_play_all_3": false,
+      "built_env_signal": "REF funds small-scale solar/community renewables, not startups",
+      "sources": [20]
+    },
+    {
+      "state": "New Hampshire",
+      "abbr": "NH",
+      "rank": 6,
+      "tier": "Grants / loan fund / retreating",
+      "lat": 43.1939,
+      "lng": -71.5724,
+      "scorecard": {
+        "gov_validates":     "Weak / absent",
+        "phil_accelerates":  "Weak / absent",
+        "industry_acquires": "Weak / absent"
+      },
+      "notes": "CDFA Clean Energy Fund (~$9M loan fund). Gap-filling via Clean Energy NH nonprofit circuit riders. State actively retreating.",
+      "primary_institutions": "CDFA Clean Energy Fund (~$9M); Clean Energy NH (nonprofit)",
+      "institution_type": "Loan fund + nonprofit circuit riders",
+      "can_play_all_3": false,
+      "built_env_signal": "Offshore wind office downgraded; $43.5M low-income solar clawed back",
+      "sources": [21,22,23]
+    }
+  ],
+  "sources": [
+    { "id": 1,  "claim": "Original framework: contech-for-cleantech intersection, gap, three-actor model", "source": "Podder et al., NREL/CP-5500-83262 (2022)", "url": "https://www.nrel.gov/docs/fy22osti/83262.pdf" },
+    { "id": 2,  "claim": "Built environment = 4% of global climate-tech VC vs 21% of emissions", "source": "PwC State of Climate Tech 2021 (Dealroom data)", "url": "https://www.nrel.gov/docs/fy22osti/83262.pdf" },
+    { "id": 3,  "claim": "Buildings = 36% of Massachusetts GHG emissions", "source": "MA Clean Energy and Climate Metrics, Mass.gov", "url": "https://www.mass.gov/info-details/massachusetts-clean-energy-and-climate-metrics" },
+    { "id": 4,  "claim": "$466M in DOE grants to MA rescinded (Oct 2025)", "source": "WBUR (Oct 3, 2025)", "url": "https://www.wbur.org/news/2025/10/03/massachusetts-healey-national-grid-umass-mit-clean-eneryg-doe" },
+    { "id": 5,  "claim": "356 DOE awards / $12.5B terminated nationally since Jan 2025", "source": "NRDC (Apr 2026)", "url": "https://www.nrdc.org/bio/ian-wells/six-months-later-fallout-does-75-billion-canceled-clean-energy-projects" },
+    { "id": 6,  "claim": "MassCEC TDA ($20M/yr) and CriticalMass ($3M/yr) programs", "source": "Boston Globe (Aug 2025)", "url": "https://www.bostonglobe.com/2025/08/29/business/masscec-energy-grant-programs-startups/" },
+    { "id": 7,  "claim": "MassCEC director on filling federal gap", "source": "Alliance for Climate Transition (ACT)", "url": "https://www.joinact.org/news/mass-clean-energy-center-launches-two-grant-programs-amid-federal-cutbacks" },
+    { "id": 8,  "claim": "InnovateMass: up to $350K non-dilutive, TRL 5-8", "source": "InnovateMass / MassCEC", "url": "https://www.masscec.com/program/innovatemass" },
+    { "id": 9,  "claim": "Holcim invests in Sublime Systems (MA cement plant)", "source": "Holcim corporate news (2024)", "url": "https://www.holcim.com/media/company-news/investment-sublime-systems-low-carbon-technology" },
+    { "id": 10, "claim": "Holcim MAQER: 500+ startups/yr assessed, 19 investments", "source": "Holcim corporate news (Jan 2026)", "url": "https://www.holcim.com/media/company-news/holcim-investment-capsol-technologies" },
+    { "id": 11, "claim": "Suffolk BOOST takes 3% equity via SAFEs (venture, not acquisition)", "source": "Construction Dive (Dec 2025)", "url": "https://www.constructiondive.com/news/suffolk-boost-2025-contech-startup-demo-day/806991/" },
+    { "id": 12, "claim": "Barr Foundation: $123M in grants (2024), climate a core area", "source": "Barr Foundation profile", "url": "https://philanthropy.org/foundation/barr-foundation/" },
+    { "id": 13, "claim": "Barr climate work centers on workforce/equity, not startups", "source": "Barr Foundation, Clean Energy Workforce", "url": "https://www.barrfoundation.org/clean-energy-workforce/" },
+    { "id": 14, "claim": "CT Green Bank statutory authority across building sectors", "source": "DSIRE", "url": "https://programs.dsireusa.org/system/program/detail/157" },
+    { "id": 15, "claim": "CI ClimateTech Fund: $100M, $150K-$2M/co, Built Environment focus", "source": "Connecticut Innovations (Jun 2026)", "url": "https://ctinnovations.com/program/climate-tech-fund/" },
+    { "id": 16, "claim": "CT C-PACE building retrofit financing", "source": "AdvanceCT", "url": "https://www.advancect.org/site-selection-and-certified-sites/incentives-and-programs/p/item/2145/ct-green-bank" },
+    { "id": 17, "claim": "DeltaClimeVT 2025 cohort + Burlington Electric pilot", "source": "DeltaClimeVT / VSJF", "url": "https://deltaclimevt.com/" },
+    { "id": 18, "claim": "Maine among fewest clean-energy jobs per capita in NE", "source": "Maine DOER", "url": "https://www.maine.gov/energy/news/two-maine-technology-companies-to-each-receive-$250,000-in-maine-clean-energy-innovation-challenge" },
+    { "id": 19, "claim": "Roux Institute incubator; Weatherization Business Lab", "source": "Maine DOER, Clean Energy Partnership Projects", "url": "https://www.maine.gov/energy/initiatives/cep/projects" },
+    { "id": 20, "claim": "RI Renewable Energy Fund = project deployment grants", "source": "Rhode Island Commerce", "url": "https://commerceri.com/renewable-energy-fund/" },
+    { "id": 21, "claim": "NH CDFA Clean Energy Fund (~$9M loan fund)", "source": "NH CDFA", "url": "https://resources.nhcdfa.org/programs/clean-energy-fund/application/program-overview-objectives/" },
+    { "id": 22, "claim": "Clean Energy NH circuit riders, 234 municipalities", "source": "New Hampshire Bulletin (Dec 2025)", "url": "https://newhampshirebulletin.com/2025/12/24/new-hampshire-clean-energy-program-goes-national-with-federal-funds/" },
+    { "id": 23, "claim": "NH offshore wind office downgraded; $43.5M solar clawed back", "source": "Clean Energy NH, News", "url": "https://www.cleanenergynh.org/news" }
+  ]
+}
