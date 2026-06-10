@@ -52,9 +52,9 @@ Edit `public/data/ne-audit.json` → run `node scripts/export-csv.js` → commit
 | ② Accelerates | Philanthropy |
 | ③ Acquires | Construction / materials industry |
 
-Status: **Working** · **Partial** · **Weak / absent**
+Status: **Working** · **Partial** · **Weak**
 
 ## Authorship
 
-Independent update. Not affiliated with NREL.
+
 Original paper: Podder et al. (2022). *Contech to Accelerate Cleantech.* NREL/CP-5500-83262.
