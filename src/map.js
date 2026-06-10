@@ -237,44 +237,29 @@ function closeAllPanels() {
 }
 
 // Feedback form submission via Formspree (no backend needed)
-async function submitFeedback(e) {
+function submitFeedback(e) {
   e.preventDefault();
-  const form   = document.getElementById('feedback-form');
-  const btn    = document.getElementById('feedback-submit');
-  const status = document.getElementById('feedback-status');
+  const form = document.getElementById('feedback-form');
 
-  btn.disabled   = true;
-  btn.textContent = 'Sending…';
+  const name      = form.querySelector('[name=name]').value.trim();
+  const email     = form.querySelector('[name=email]').value.trim();
+  const state     = form.querySelector('[name=state]').value;
+  const data_type = form.querySelector('[name=data_type]').value;
+  const desc      = form.querySelector('[name=description]').value.trim();
+  const url       = form.querySelector('[name=source_url]').value.trim();
 
-  const payload = {
-    name:        form.querySelector('[name=name]').value,
-    email:       form.querySelector('[name=email]').value,
-    state:       form.querySelector('[name=state]').value,
-    data_type:   form.querySelector('[name=data_type]').value,
-    description: form.querySelector('[name=description]').value,
-    source_url:  form.querySelector('[name=source_url]').value,
-  };
+  const subject = encodeURIComponent(`[NE Map] Data contribution: ${state} — ${data_type}`);
 
-  try {
-    const res = await fetch('https://formspree.io/f/FORMSPREE_ID', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body:    JSON.stringify(payload)
-    });
-    if (res.ok) {
-      status.textContent = '✓ Submitted — thank you. We'll review and update the map.';
-      status.className   = 'form-status ok';
-      form.reset();
-    } else {
-      throw new Error('Server error');
-    }
-  } catch {
-    status.textContent = '✗ Something went wrong. Email ankur@dexdogs.earth directly.';
-    status.className   = 'form-status err';
-  }
+  const body = encodeURIComponent(
+    `Name: ${name || '(not provided)'}\n` +
+    `Reply-to: ${email || '(not provided)'}\n` +
+    `State: ${state}\n` +
+    `Type: ${data_type}\n\n` +
+    `Description:\n${desc}\n\n` +
+    `Source URL: ${url || '(none)'}\n`
+  );
 
-  btn.disabled    = false;
-  btn.textContent = 'Submit';
+  window.location.href = `mailto:ankur@dexdogs.earth?subject=${subject}&body=${body}`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
